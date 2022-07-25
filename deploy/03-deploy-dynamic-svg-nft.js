@@ -13,13 +13,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const chainId = network.config.chainId;
   let ethUsdPriceFeedAddress;
 
-  if (chainId == 31337) {
+  if (developmentChains.includes(network.name)) {
     // Find ETH/USD price feed
     const EthUsdAggregator = await ethers.getContract("MockV3Aggregator");
     ethUsdPriceFeedAddress = EthUsdAggregator.address;
   } else {
     ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeed;
   }
+
+  console.log("addrwes=----", ethUsdPriceFeedAddress);
 
   const lowSVG = await fs.readFileSync("./images/dynamicNft/frown.svg", {
     encoding: "utf8",

@@ -8,8 +8,8 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract DynamicSvgNft is ERC721 {
     uint256 private s_tokenCounter;
-    string private i_lowImageURI;
-    string private i_highImageURI;
+    string private s_lowImageURI;
+    string private s_highImageURI;
     string private constant base64EncodedSvgPrefix =
         "data:image/svg+xml;base64,";
 
@@ -24,8 +24,8 @@ contract DynamicSvgNft is ERC721 {
     ) ERC721("DynamicSvgNFT", "DSN") {
         s_tokenCounter = 0;
         i_priceFeed = AggregatorV3Interface(priceFeedAddress);
-        i_lowImageURI = svgToImageURI(lowSvg);
-        i_highImageURI = svgToImageURI(highSvg);
+        s_lowImageURI = svgToImageURI(lowSvg);
+        s_highImageURI = svgToImageURI(highSvg);
     }
 
     function svgToImageURI(string memory svg)
@@ -42,8 +42,8 @@ contract DynamicSvgNft is ERC721 {
 
     function mintNFT(int256 highValue) public {
         s_tokenIdToHighValues[s_tokenCounter] = highValue;
-        s_tokenCounter += 1;
         _safeMint(msg.sender, s_tokenCounter);
+        s_tokenCounter += 1;
         emit CreatedNFT(s_tokenCounter, highValue);
     }
 
@@ -54,16 +54,19 @@ contract DynamicSvgNft is ERC721 {
     function tokenURI(uint256 tokenId)
         public
         view
+        virtual
         override
         returns (string memory)
     {
-        require(_exists(tokenId), "URI Query for non existent token");
-        string memory imageURI = i_lowImageURI;
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
         (, int256 price, , , ) = i_priceFeed.latestRoundData();
+        string memory imageURI = s_lowImageURI;
         if (price >= s_tokenIdToHighValues[tokenId]) {
-            imageURI = i_highImageURI;
+            imageURI = s_highImageURI;
         }
-
         return
             string(
                 abi.encodePacked(
