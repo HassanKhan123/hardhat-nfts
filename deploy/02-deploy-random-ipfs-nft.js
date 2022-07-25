@@ -25,17 +25,18 @@ const metaDataTemplate = {
   ],
 };
 
+const FUND_AMOUNT = "1000000000000000000000";
+let tokenUris = [
+  "ipfs://QmWftbwkJZHAA1mVBxJ1Gn3EPzGc8qvcWz5V7ZHpGcroM6",
+  "ipfs://QmSdKZHnStsM6g2QmX6x1qC1mjGjPhaw61CzUx4B3EwRsw",
+  "ipfs://QmQ1qRt7GWNq1tHVmyir3FJqfjPjdT2EbyYs4VNUbKg541",
+];
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = network.config.chainId;
   let vrfCoordinatorV2Address, subscriptionId;
-
-  let tokenUris = [
-    "ipfs://QmWftbwkJZHAA1mVBxJ1Gn3EPzGc8qvcWz5V7ZHpGcroM6",
-    "ipfs://QmSdKZHnStsM6g2QmX6x1qC1mjGjPhaw61CzUx4B3EwRsw",
-    "ipfs://QmQ1qRt7GWNq1tHVmyir3FJqfjPjdT2EbyYs4VNUbKg541",
-  ];
 
   if (UPLOAD_TO_PINATA) {
     tokenUris = await handleTokenUris();
@@ -49,6 +50,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const txResponse = await vrfCoordinatorV2Mock.createSubscription();
     const txReceipt = await txResponse.wait(1);
     subscriptionId = txReceipt.events[0].args.subId;
+    await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT);
   } else {
     vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"];
     subscriptionId = networkConfig[chainId]["subscriptionId"];
