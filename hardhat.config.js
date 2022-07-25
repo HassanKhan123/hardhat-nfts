@@ -1,5 +1,5 @@
 const {
-  RINKEBY_RPC_URL,
+  RINKBEY_RPC_URL,
   PRIVATE_KEY,
   COINMARKET_API_KEY,
   ETHERSCAN_API_KEY,
@@ -22,7 +22,7 @@ module.exports = {
       blockConfirmation: 1,
     },
     rinkeby: {
-      url: RINKEBY_RPC_URL,
+      url: RINKBEY_RPC_URL,
       accounts: [PRIVATE_KEY],
       chainId: 4,
       blockConfirmations: 6,
